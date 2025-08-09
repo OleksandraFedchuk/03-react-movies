@@ -1,7 +1,10 @@
+import SearchBar from "../SearchBar/SearchBar";
 import css from "./App.module.css";
 
 export default function App() {
-  <>
-    <h1>Hello</h1>
-  </>;
+  return (
+    <div className={css.app}>
+      <SearchBar />
+    </div>
+  );
 }
