@@ -1,10 +1,15 @@
 import css from "./SearchBar.module.css";
 
-export interface ServiceBarProps {
-  onSubmit: () => void;
+interface SearchBarProps {
+  onSearch: (item: string) => Promise<void>;
 }
 
-export default function ServiceBar({ onSubmit }) {
+export default function SearchBar({ onSearch }: SearchBarProps) {
+  const handleSubmit = (formData: FormData) => {
+    const query = formData.get("query") as string;
+    onSearch(query);
+  };
+
   return (
     <header className={css.header}>
        {" "}
@@ -19,7 +24,8 @@ export default function ServiceBar({ onSubmit }) {
                 Powered by TMDB    {" "}
         </a>
            {" "}
-        <form className={css.form}>
+        <form className={css.form} action={handleSubmit}>
+          {" "}
                {" "}
           <input
             className={css.input}
