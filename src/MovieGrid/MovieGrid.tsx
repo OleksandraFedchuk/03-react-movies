@@ -2,7 +2,7 @@ import css from "./MovieGrid.module.css";
 import type { Movie } from "../types/movie";
 
 interface MovieGridProps {
-  onSelect: () => void;
+  onSelect: (movie: Movie) => void;
   movies: Movie[];
 }
 
@@ -10,7 +10,6 @@ export default function MovieGrid({ onSelect, movies }: MovieGridProps) {
   const selectMovie = (index: number) => {
     onSelect(movies[index]);
   };
-
   return (
     <ul className={css.grid}>
       {movies.map(({ id, title, poster_path }, i) => {
@@ -27,7 +26,7 @@ export default function MovieGrid({ onSelect, movies }: MovieGridProps) {
                 alt={title}
                 loading="lazy"
               />
-              <h2 className={css.title}>Movie title{title}</h2>
+              <h2 className={css.title}>{title}</h2>
             </div>
           </li>
         );
