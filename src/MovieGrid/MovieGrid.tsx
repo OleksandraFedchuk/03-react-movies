@@ -1,28 +1,37 @@
 import css from "./MovieGrid.module.css";
+import type { Movie } from "../types/movie";
 
 interface MovieGridProps {
   onSelect: () => void;
-  movies: [];
+  movies: Movie[];
 }
 
-export default function MovieGrid() {
+export default function MovieGrid({ onSelect, movies }: MovieGridProps) {
+  const selectMovie = (index: number) => {
+    onSelect(movies[index]);
+  };
+
   return (
     <ul className={css.grid}>
-        {/* Набір елементів списку з фільмами */} {" "}
-      <li>
-           {" "}
-        <div className={css.card}>
-               {" "}
-          <img
-            className={css.image}
-            src="https://image.tmdb.org/t/p/w500/poster-path"
-            alt="movie title"
-            loading="lazy"
-          />
-              <h2 className={css.title}>Movie title</h2>   {" "}
-        </div>
-         {" "}
-      </li>
+      {movies.map(({ id, title, poster_path }, i) => {
+        return (
+          <li key={id} onClick={() => selectMovie(i)}>
+            <div className={css.card}>
+              <img
+                className={css.image}
+                src={
+                  poster_path
+                    ? "https://image.tmdb.org/t/p/w500" + poster_path
+                    : "https://img.freepik.com/free-photo/assortment-cinema-elements-red-background-with-copy-space_23-2148457848.jpg"
+                }
+                alt={title}
+                loading="lazy"
+              />
+              <h2 className={css.title}>Movie title{title}</h2>
+            </div>
+          </li>
+        );
+      })}
     </ul>
   );
 }

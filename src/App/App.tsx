@@ -2,29 +2,68 @@ import SearchBar from "../SearchBar/SearchBar";
 import { useState, useEffect } from "react";
 import css from "./App.module.css";
 import MovieModal from "../MovieModal/MovieModal";
-import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
+import MovieGrid from "../MovieGrid/MovieGrid";
+import { fetchMovies } from "../services/movieServis";
+import Loader from "../Loader/Loader";
+import ErrorMessage from "../ErrorMessage/ErrorMessage";
+import { type Movie } from "../types/movie";
 
 export default function App() {
-  // const [isModalOpen, setIsModalOpen] = useState(false);
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
-  useEffect(() => {}, []);
+  const delay = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
 
-  const handleSearch = async (item: string) => {
-    console.log("handleSearch", item);
+  const handleSearch = async (query: string) => {
+    setMovies([]);
+    setIsLoading(true);
+    setIsError(false);
+    try {
+      const result = await fetchMovies(query);
 
-    // const response = axios.get("https://api.themoviedb.org/3/search/}");
-    // console.log(response.data);
+      if (result.length === 0) {
+        toast("No movies found for your request.");
+        setMovies([]);
+        return;
+      }
+      setMovies(result);
+    } catch {
+      setIsError(true);
+      toast.error("Something went wrong, try again later.");
+    } finally {
+      await delay(1000);
+      setIsLoading(false);
+    }
   };
 
-  // const openModal = () => setIsModalOpen(true);
-  // const closeModal = () => setIsModalOpen(false);
+  useEffect(() => {
+    handleSearch("popular");
+  }, []);
+
+  const handleSelect = (movie: Movie) => {
+    setSelectedMovie(movie);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedMovie(null);
+  };
 
   return (
     <div className={css.app}>
+      <Toaster position="top-center" />
       <SearchBar onSearch={handleSearch} />
-      {/* <MovieModal onClose={closeModal} /> */}
+      {isLoading && <Loader />}
+      {isError && <ErrorMessage />}
+      {!isLoading && !isError && (
+        <MovieGrid movies={movies} onSelect={handleSelect} />
+      )}
+      {selectedMovie && (
+        <MovieModal movie={selectedMovie} onClose={handleCloseModal} />
+      )}
     </div>
   );
 }
-
-// https://api.themoviedb.org/3/search/movie

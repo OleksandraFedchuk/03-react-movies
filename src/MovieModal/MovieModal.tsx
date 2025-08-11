@@ -1,12 +1,43 @@
+import { createPortal } from "react-dom";
+import { useEffect } from "react";
 import css from "./MovieModal.module.css";
+import type { Movie } from "../types/movie";
 
 interface MovieModalProps {
+  movie: Movie;
   onClose: () => void;
 }
 
-export default function MovieModal({ onClose }: MovieModalProps) {
-  return (
-    <div className={css.backdrop} role="dialog" aria-modal="true">
+export default function MovieModal({ movie, onClose }: MovieModalProps) {
+  const handleBackdropClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (event.target === event.currentTarget) {
+      onClose();
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "escape") {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
+  return createPortal(
+    <div
+      className={css.backdrop}
+      onClick={handleBackdropClick}
+      role="dialog"
+      aria-modal="true"
+    >
       <div className={css.modal}>
         <button
           onClick={onClose}
@@ -16,21 +47,26 @@ export default function MovieModal({ onClose }: MovieModalProps) {
           &times;
         </button>
         <img
-          src="https://image.tmdb.org/t/p/original/backdrop_path"
-          alt="movie_title"
+          src={
+            movie.backdrop_path
+              ? `https://image.tmdb.org/t/p/original/${movie.backdrop_path}`
+              : "https://via.placeholder.com/800x450?text=No+Image"
+          }
+          alt={movie.title}
           className={css.image}
         />
         <div className={css.content}>
-          <h2>movie_title</h2>
-          <p>movie_overview</p>
+          <h2>{movie.title}</h2>
+          <p>{movie.overview}</p>
           <p>
-            <strong>Release Date:</strong> movie_release_date
+            <strong>Release Date:</strong> {movie.release_date}
           </p>
           <p>
-            <strong>Rating:</strong> movie_vote_average/10
+            <strong>Rating:</strong> {movie.vote_average}
           </p>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
