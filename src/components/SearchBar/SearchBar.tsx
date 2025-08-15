@@ -15,7 +15,7 @@ export default function SearchBar({ onSubmit }: SearchBarProps) {
       return;
     }
 
-    onSearch(trimmedQuery);
+    onSubmit(trimmedQuery);
   }
 
   return (
